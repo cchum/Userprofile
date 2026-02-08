@@ -52,7 +52,7 @@ def update_user(id: int, user: User):
     for i in range(len(users)):
         if users[i].id == id:
             users[i] = user
-            return "User Added Successfully"
+            return "User Updated Successfully"
 
     return "User Not Found"
 
