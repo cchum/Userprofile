@@ -15,3 +15,10 @@ users = [
 @app.get("/users")
 def get_all_users():
     return users
+
+@app.get("/user/{id}")
+def get_user_by_id(id: int):
+    for user in users:
+        if user.id == id:
+            return user
+    return "User Not Found"
