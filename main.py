@@ -1,4 +1,5 @@
 from fastapi import FastAPI 
+from models import User
 
 app = FastAPI()
 
@@ -7,8 +8,8 @@ def greet():
     return "Welcome to this webpage"
 
 users = [
-    User(1, "Nikola", "Jokic", "Joker", "njokic"),
-    User(2, "Jamal", "Murray", "Blue Arrow", "jmurray")
+    User(id=1, first_name="Nikola", last_name="Jokic", username="Joker", email="joker@gmail.com",password="njokic"),
+    User(id=2, first_name="Jamal", last_name="Murray", username="Blue Arrow", email="bluearrow@gmail.com",password="jmurray")
 ]
 
 @app.get("/users")
