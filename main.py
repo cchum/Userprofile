@@ -18,6 +18,19 @@ users = [
     
 ]
 
+def init_db():
+    db = session()
+
+    count = db.query(database_models.User).count
+
+    if count == 0:
+
+        for user in users:
+            db.add(database_models.User(**user.model_dump()))
+        db.commit()
+
+init_db()
+
 @app.get("/users")
 def get_all_users():
     return users
