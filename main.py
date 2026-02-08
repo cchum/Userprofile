@@ -9,7 +9,9 @@ def greet():
 
 users = [
     User(id=1, first_name="Nikola", last_name="Jokic", username="Joker", email="joker@gmail.com",password="njokic"),
-    User(id=2, first_name="Jamal", last_name="Murray", username="Blue Arrow", email="bluearrow@gmail.com",password="jmurray")
+    User(id=2, first_name="Jamal", last_name="Murray", username="Blue Arrow", email="bluearrow@gmail.com",password="jmurray"),
+    User(id=3, first_name="Aaron", last_name="Gordon", username="Mr. Nugget", email="ag@gmail.com",password="agordon")
+    
 ]
 
 @app.get("/users")
@@ -21,4 +23,26 @@ def get_user_by_id(id: int):
     for user in users:
         if user.id == id:
             return user
+    return "User Not Found"
+
+@app.post("/user")
+def add_user(user: User):
+    users.append(user)
+    return user
+
+@app.put("/user")
+def update_user(id: int, user: User):
+    for i in range(len(users)):
+        if users[i].id == id:
+            users[i] = user
+            return "User Added Successfully"
+
+    return "User Not Found"
+
+@app.delete("/user")
+def delete_user(id: int):
+    for i in range(len(users)):
+        if users[i].id == id:
+            del users[i]
+            return "User Deleted Successfully"
     return "User Not Found"
