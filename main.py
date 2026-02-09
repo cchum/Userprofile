@@ -1,7 +1,8 @@
-from fastapi import FastAPI 
+from fastapi import Depends, FastAPI 
 from models import User
 from database import session, engine
 import database_models
+from sqlalchemy.orm import Session
 
 app = FastAPI()
 
@@ -18,6 +19,13 @@ users = [
     
 ]
 
+def get_db():
+    db = session()
+    try:
+        yield db
+    finally:
+        db.close()
+
 def init_db():
     db = session()
 
@@ -32,34 +40,44 @@ def init_db():
 init_db()
 
 @app.get("/users")
-def get_all_users():
-    return users
+def get_all_users(db: Session = Depends(get_db)):
+
+    db_users = db.query(database_models.User).all()
+    return db_users
 
 @app.get("/user/{id}")
-def get_user_by_id(id: int):
-    for user in users:
-        if user.id == id:
-            return user
+def get_user_by_id(id: int, db: Session = Depends(get_db)):
+    db_user = db.query(database_models.User).filter(database_models.User.id == id).first()
+    if db_user:
+        return db_user
     return "User Not Found"
 
 @app.post("/user")
-def add_user(user: User):
-    users.append(user)
+def add_user(user: User, db: Session = Depends(get_db)):
+    db.add(database_models.User(**user.model_dump()))
+    db.commit()
     return user
 
 @app.put("/user")
-def update_user(id: int, user: User):
-    for i in range(len(users)):
-        if users[i].id == id:
-            users[i] = user
-            return "User Updated Successfully"
-
-    return "User Not Found"
+def update_user(id: int, user: User, db: Session = Depends(get_db)):
+    db_user = db.query(database_models.User).filter(database_models.User.id == id).first()
+    if db_user:
+        db_user.first_name = user.first_name
+        db_user.last_name = user.last_name
+        db_user.username = user.username
+        db_user.email = user.email
+        db_user.password = user.password
+        db.commit()
+        return "User Updated"
+    else:
+        return "User Not Found"
 
 @app.delete("/user")
-def delete_user(id: int):
-    for i in range(len(users)):
-        if users[i].id == id:
-            del users[i]
-            return "User Deleted Successfully"
-    return "User Not Found"
+def delete_user(id: int, db: Session = Depends(get_db)):
+    db_user = db.query(database_models.User).filter(database_models.User.id == id).first()
+    if db_user:
+        db.delete(db_user)
+        db.commit()
+        return "User Deleted Successfully"
+    else:
+     return "User Not Found"
